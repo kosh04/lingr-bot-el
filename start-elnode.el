@@ -7,8 +7,9 @@
 (package-initialize)
 (message "packages initialized")
 
-(package-refresh-contents)
-(message "packages refreshed")
+(package-install 'elnode)
+(require 'elnode)
+(message "elnode installed")
 
 (setq
  elnode-init-port
@@ -16,9 +17,6 @@
 (setq elnode-init-host "0.0.0.0")
 (setq elnode-do-init nil)
 (message "elnode init done")
-
-(package-install 'elnode)
-(message "elnode installed")
 
 (defun handler (httpcon)
   "Demonstration function"
