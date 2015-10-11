@@ -8,6 +8,9 @@
 (package-initialize)
 (message "packages initialized")
 
+(package-refresh-contents)
+(message "packages refreshed")
+
 (package-install 'elnode)
 (require 'elnode)
 (message "elnode installed")
