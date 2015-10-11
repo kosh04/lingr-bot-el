@@ -1,39 +1,15 @@
-;; -*- lexical-binding: t -*-
-(require 'package)
-(setq package-archives
-      '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("marmalade" . "http://marmalade-repo.org/packages/")))
-(message "package archives configured added")
+;;; start-elnode.el             -*- lexical-binding: t -*-
 
-(package-initialize)
-(message "packages initialized")
+(when load-file-name
+  (add-to-list 'load-path (file-name-directory load-file-name)))
 
-(package-refresh-contents)
-(message "packages refreshed")
+;;(load "setup-elnode")
+(load "lingr-bot")
 
-(package-install 'elnode)
-(require 'elnode)
-(message "elnode installed")
-
-(setq
- elnode-init-port
- (string-to-number (or (getenv "PORT") "8080")))
-(setq elnode-init-host "0.0.0.0")
-(setq elnode-do-init nil)
-(message "elnode init done")
-
-(defun handler (httpcon)
-  "Demonstration function"
-  (elnode-http-start httpcon "200"
-                     '("Content-type" . "text/html")
-                     `("Server" . ,(concat "GNU Emacs " emacs-version)))
-  (elnode-http-return httpcon
-                      "<html><body><h1>Hello from EEEMACS.</h1></body></html>"))
-
-;;(elnode-start 'handler :port elnode-init-port :host elnode-init-host)
-(elnode-init)
+(let ((port (string-to-number (or (getenv "PORT") "8080"))))
+  (lingr-bot-server-start port))
 
 (while t
-  (accept-process-output nil 1))
+  (accept-process-output nil 1.0))
 
-;; End
+;;; End
