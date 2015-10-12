@@ -1,11 +1,11 @@
 ;;; lingr-bot.el    --- Chatbot on lingr        -*- lexical-binding: t -*-
 
-;; Author: KOBAYASHI Shigeru (ksoh) <shigeru.kb@gmamil.com> 
+;; Author: KOBAYASHI Shigeru (kosh) <shigeru.kb@gmamil.com> 
 ;; Version: 20151012.0
 ;; Created: 12 Oct 2015
 ;; License: MIT
 
-;; Keywords: chat bot
+;; Keywords: irc bot
 ;; Prefix: lingr-bot
 ;; Separator: -
 
@@ -23,7 +23,6 @@
 
 (define-namespace lingr-bot-
 
-:autoload
 (defvar server-port 8080)
 (defvar server-host "0.0.0.0")
 
