@@ -13,6 +13,12 @@
 (require 's)
 (require 'let-alist)
 (require 'names)
+(require 'time)
+
+(require 'server)
+(setq server-name "elnode-webserver")
+(setq server-use-tcp t)
+(server-start)
 
 (define-namespace lingr-bot-
 
@@ -24,6 +30,7 @@
   (let (;;(default-directory nil)
         (process-environment nil)
         (initial-environment nil)
+        (shell-file-name "true")        ; "do nothing" command
         (load-path nil))
     (condition-case e
         (eval form)
@@ -68,7 +75,7 @@
   (elnode-method httpcon
     (POST
      ;; TODO: IP whitelist
-     (let ((http-body (caar (elnode-http-params httpcon))))
+     (let ((http-body (elnode--http-post-body httpcon)))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
        (elnode-http-return httpcon (s-truncate (- 1000 3) (-parse-message http-body)))))
     (t
