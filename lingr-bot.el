@@ -1,9 +1,15 @@
-;;; lingr-bot.el	-*- lexical-binding: t -*-
+;;; lingr-bot.el    --- Chatbot on lingr        -*- lexical-binding: t -*-
 
+;; Author: KOBAYASHI Shigeru (ksoh) <shigeru.kb@gmamil.com> 
 ;; Version: 20151012.0
+;; Created: 12 Oct 2015
+;; License: MIT
+
 ;; Keywords: chat bot
 ;; Prefix: lingr-bot
 ;; Separator: -
+
+;;; Commentary:
 
 ;;; Code:
 
@@ -15,11 +21,6 @@
 (require 'names)
 (require 'time)
 
-(require 'server)
-(setq server-name "elnode-webserver")
-(setq server-use-tcp t)
-(server-start)
-
 (define-namespace lingr-bot-
 
 :autoload
@@ -30,16 +31,24 @@
   (let (;;(default-directory nil)
         (process-environment nil)
         (initial-environment nil)
-        (shell-file-name "true")        ; "do nothing" command
+        (exec-path nil)
+        (shell-file-name "true")        ; command "do nothing"
         (load-path nil))
-    (condition-case e
-        (eval form)
-      (error (error-message-string e)))))
+    (with-timeout (5 "Timeout.")
+      (with-temp-buffer
+        (condition-case e
+            (eval form)
+          (error (error-message-string e)))))))
 
 (defun -dispatch-message (text)
   (cond
-   ;; ?emacs version
-   ((equal text "?emacs version") emacs-version)
+   ;; show version
+   ((equal text "M-x emacs-version")
+    emacs-version)
+
+   ;; show uptime
+   ((equal text "M-x uptime")
+    (emacs-uptime))
 
    ;; !emacs EXPR
    ((string-match "^!emacs \\(.+\\)" text)
@@ -108,4 +117,4 @@
 
 (provide 'lingr-bot)
 
-;;; lingr-bot.el ends here.
+;;; lingr-bot.el ends here
