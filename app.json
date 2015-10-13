@@ -1,0 +1,6 @@
+{
+    "name": "lingr-bot-el",
+    "env": {
+        "BUILDPACK_URL": "https://github.com/kosh04/heroku-buildpack-emacs"
+    }
+}

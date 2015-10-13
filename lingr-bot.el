@@ -1,7 +1,7 @@
 ;;; lingr-bot.el    --- Chatbot on lingr        -*- lexical-binding: t -*-
 
 ;; Author: KOBAYASHI Shigeru (kosh) <shigeru.kb@gmamil.com> 
-;; Version: 20151012.0
+;; Version: 20151014.0
 ;; Created: 12 Oct 2015
 ;; License: MIT
 
@@ -58,7 +58,8 @@
    ;; C-h f FUNCTION
    ((string-match "^C-h f \\(.+\\)" text)
     (let ((msg (match-string 1 text)))
-      (documentation (intern msg))))
+      (when (functionp (intern msg))
+        (documentation (intern msg)))))
 
    ;; C-h v VARIABLE
    ((string-match "^C-h v \\(.+\\)" text)
