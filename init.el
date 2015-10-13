@@ -1,5 +1,8 @@
 ;;; start-elnode.el             -*- lexical-binding: t -*-
 
+(require 'package)
+(package-initialize)
+
 (unless (package-installed-p 'elnode)
   (load "setup-elnode"))
 
