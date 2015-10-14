@@ -1,10 +1,7 @@
-;;; start-elnode.el             -*- lexical-binding: t -*-
+;;; start-elnode.el
 
-(require 'package)
-(package-initialize)
-
-(unless (package-installed-p 'elnode)
-  (load "setup-elnode"))
+(or (locate-library "elnode")
+    (load "setup-elnode"))
 
 (load "lingr-bot")
 
