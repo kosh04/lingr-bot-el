@@ -21,6 +21,8 @@
 (require 'names)
 (require 'time)
 
+(load "elnode-patch")
+
 (define-namespace lingr-bot-
 
 (defvar server-port 8080)
@@ -85,6 +87,7 @@
     (POST
      ;; TODO: IP whitelist
      (let ((http-body (elnode--http-post-body httpcon)))
+       (setq http-body (decode-coding-string http-body 'utf-8))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
        (elnode-http-return httpcon (s-truncate (- 1000 3) (-parse-message http-body)))))
     (t
