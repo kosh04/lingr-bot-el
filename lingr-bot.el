@@ -16,6 +16,7 @@
 (require 'cl-lib)
 (require 'elnode)
 (require 'json)
+(require 'dash)
 (require 's)
 (require 'let-alist)
 (require 'names)
@@ -76,6 +77,12 @@
                     (when (equal .message.type "user")
                       (cl-return (-dispatch-message .message.text))))))))
 
+(defun -pretty-format (text)
+  "Pretty format TEXT for lingr message output."
+  (--> (or text "")
+       (s-replace "\s" "\u3000" it)
+       (s-truncate (- 1000 3) it)))
+
 (defun root-handler (httpcon)
   (elnode-http-start httpcon 200 `("Server" . ,(format "GNU Emacs %s" emacs-version)))
   (elnode-http-return httpcon "It works!"))
@@ -84,9 +91,12 @@
   (elnode-method httpcon
     (POST
      ;; TODO: IP whitelist
-     (let ((http-body (elnode--http-post-body httpcon)))
+     (let* ((http-body
+             ;;(elnode--http-post-body httpcon)
+             (caar (elnode-http-params httpcon)))
+            (text (-parse-message http-body)))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
-       (elnode-http-return httpcon (s-truncate (- 1000 3) (-parse-message http-body)))))
+       (elnode-http-return httpcon (-pretty-format text))))
     (t
      (elnode-send-redirect httpcon "http://lingr.com/"))))
 

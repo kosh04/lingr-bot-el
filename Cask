@@ -7,6 +7,7 @@
 (depends-on "cl-lib")
 (depends-on "elnode")
 (depends-on "json")
+(depends-on "dash")
 (depends-on "s")
 (depends-on "let-alist")
 (depends-on "names")

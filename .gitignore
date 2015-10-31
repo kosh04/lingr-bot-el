@@ -1,2 +1,7 @@
+.cask/
 /emacs/
 /emacs.tar.gz
+
+# for test
+Makefile
+test/

@@ -21,6 +21,7 @@
 (package-install 'json)
 (package-install 'let-alist)
 (package-install 'names)
+(package-install 'dash)
 (package-install 's)
 (message "require package installed")
 
