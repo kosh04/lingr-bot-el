@@ -22,6 +22,8 @@
 (require 'names)
 (require 'time)
 
+(load "elnode-patch")
+
 (define-namespace lingr-bot-
 
 (defvar server-port 8080)
@@ -79,8 +81,8 @@
 
 (defun -pretty-format (text)
   "Pretty format TEXT for lingr message output."
-  (--> (or text "")
-       (s-replace "\s" "\u3000" it)
+  (--> text
+       (s-replace "\s" "\u00a0" it)
        (s-truncate (- 1000 3) it)))
 
 (defun root-handler (httpcon)
@@ -91,9 +93,10 @@
   (elnode-method httpcon
     (POST
      ;; TODO: IP whitelist
-     (let* ((http-body
+     (let* ((http-body-raw
              ;;(elnode--http-post-body httpcon)
              (caar (elnode-http-params httpcon)))
+            (http-body (decode-coding-string http-body-raw 'utf-8))
             (text (-parse-message http-body)))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
        (elnode-http-return httpcon (-pretty-format text))))
