@@ -7,8 +7,6 @@ Heroku で動作させることを想定していますが、サーバ自体は�
 
 - [Bot Profile](http://lingr.com/bot/emacs24)
 
-今のところ、稼働している Emacs は最小構成のため日本語は扱えません。
-
 
 ## コマンド
 

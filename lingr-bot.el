@@ -1,7 +1,7 @@
-;;; lingr-bot.el    --- Chatbot on lingr        -*- lexical-binding: t -*-
+;;; lingr-bot.el --- Chatbot on lingr  -*- lexical-binding: t -*-
 
 ;; Author: KOBAYASHI Shigeru (kosh) <shigeru.kb@gmamil.com> 
-;; Version: 20151014.0
+;; Version: 20151101.0
 ;; Created: 12 Oct 2015
 ;; License: MIT
 
