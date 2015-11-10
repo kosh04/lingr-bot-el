@@ -12,6 +12,9 @@
 (depends-on "let-alist")
 (depends-on "names")
 
+(development
+ (depends-on "ert"))
+
 ;;; Local Variables:
 ;;; mode: emacs-lisp
 ;;; End:

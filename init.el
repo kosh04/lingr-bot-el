@@ -3,6 +3,8 @@
 (or (locate-library "elnode")
     (load "setup-elnode"))
 
+(load "elnode-patch")
+
 (load "lingr-bot")
 
 (lingr-bot-server-start

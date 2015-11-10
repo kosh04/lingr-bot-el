@@ -22,14 +22,17 @@
 (require 'names)
 (require 'time)
 
-(load "elnode-patch")
-
 (define-namespace lingr-bot-
 
 (defvar server-port 8080)
 (defvar server-host "0.0.0.0")
 
+(defun -log (fmt &rest args)
+  "Write simple log message."
+  (message "[lingr-bot] %s" (apply #'format fmt args)))
+
 (defun sandbox-eval (form)
+  (-log "eval: %S" form)
   (let (;;(default-directory nil)
         (process-environment nil)
         (initial-environment nil)
@@ -52,7 +55,7 @@
    ((equal text "M-x uptime")
     (emacs-uptime))
 
-   ;; !emacs EXPR
+   ;; !emacs EXPR (should be one-line)
    ((string-match "^!emacs \\(.+\\)" text)
     (let ((msg (match-string 1 text)))
       (prin1-to-string
@@ -61,7 +64,7 @@
    ;; C-h f FUNCTION
    ((string-match "^C-h f \\(.+\\)" text)
     (let ((msg (match-string 1 text)))
-      (when (functionp (intern msg))
+      (when (fboundp (intern msg))
         (documentation (intern msg)))))
 
    ;; C-h v VARIABLE
@@ -81,7 +84,7 @@
 
 (defun -pretty-format (text)
   "Pretty format TEXT for lingr message output."
-  (--> text
+  (--> (or text "")
        (s-replace "\s" "\u00a0" it)
        (s-truncate (- 1000 3) it)))
 
@@ -93,15 +96,19 @@
   (elnode-method httpcon
     (POST
      ;; TODO: IP whitelist
-     (let* ((http-body-raw
-             ;;(elnode--http-post-body httpcon)
-             (caar (elnode-http-params httpcon)))
+     (let* ((http-body-raw (elnode-raw-http-body httpcon))
             (http-body (decode-coding-string http-body-raw 'utf-8))
-            (text (-parse-message http-body)))
+            (text (condition-case e
+                      (-parse-message http-body)
+                    (error
+                     (-log "parse-message fail: %S" e)
+                     nil))))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
-       (elnode-http-return httpcon (-pretty-format text))))
+       (when text
+         (elnode-http-send-string httpcon (-pretty-format text)))
+       (elnode-http-return httpcon)))
     (t
-     (elnode-send-redirect httpcon "http://lingr.com/"))))
+     (elnode-send-redirect httpcon "http://lingr.com/bot/emacs24"))))
 
 (defun httpd-dispatcher (httpcon)
   (elnode-dispatcher httpcon
