@@ -10,12 +10,10 @@
 
 (advice-add 'elnode-http-send-string :around 'elnode--http-send-bytes)
 
+;; FIXME: where Elnode API to get raw http body is?
 (defun elnode-raw-http-body (httpcon)
   "[user] Return raw http body string in HTTPCON session."
   (when (process-live-p httpcon)
-    (with-current-buffer (process-buffer httpcon)
-      (buffer-substring
-       (process-get httpcon :elnode-header-end)
-       (point-max)))))
+    (elnode--http-post-body httpcon)))
 
 (provide 'elnode-patch)

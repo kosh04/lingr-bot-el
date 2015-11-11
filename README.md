@@ -20,7 +20,7 @@ Heroku で動作させることを想定していますが、サーバ自体は�
 ## 動作環境
 
 - GNU Emacs 24+
-- Elnode (それ以外の必要ライブラリは Cask を参照)
+- Elnode 0.9.9.8.8 (それ以外の必要ライブラリは Cask を参照)
 - Cask (optional)
 
 
