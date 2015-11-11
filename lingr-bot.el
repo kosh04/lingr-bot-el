@@ -58,8 +58,10 @@
    ;; !emacs EXPR (should be one-line)
    ((string-match "^!emacs \\(.+\\)" text)
     (let ((msg (match-string 1 text)))
-      (prin1-to-string
-       (sandbox-eval (ignore-errors (read msg))))))
+      (condition-case e
+          (prin1-to-string
+           (sandbox-eval (read msg)))
+        (error (error-message-string e)))))
 
    ;; C-h f FUNCTION
    ((string-match "^C-h f \\(.+\\)" text)

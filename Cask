@@ -5,7 +5,7 @@
 (source melpa-stable)
 
 (depends-on "cl-lib")
-(depends-on "elnode")
+(depends-on "elnode" "0.9.9.8.8")
 (depends-on "json")
 (depends-on "dash")
 (depends-on "s")
