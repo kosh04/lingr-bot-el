@@ -1,5 +1,7 @@
 ## Chatbot on Lingr
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/kosh04/lingr-bot-el)
+
 Lingr 上の発言に反応するボットです。
 
 Emacs Webサーバライブラリ [Elnode](https://github.com/nicferrier/elnode) を

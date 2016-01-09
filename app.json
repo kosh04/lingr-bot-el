@@ -1,5 +1,7 @@
 {
     "name": "lingr-bot-el",
+    "description": "Chatbot on Lingr",
+    "repository": "https://github.com/kosh04/lingr-bot-el",
     "env": {
         "BUILDPACK_URL": "https://github.com/kosh04/heroku-buildpack-emacs"
     }
