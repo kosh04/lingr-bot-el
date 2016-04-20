@@ -7,8 +7,15 @@
 
 (load "lingr-bot")
 
-(lingr-bot-server-start
- (string-to-number (or (getenv "PORT") "8080")))
+(load "command/eval")
+(load "command/help")
+(load "command/uptime")
+(load "command/version")
+
+(setq lingr-bot-server-port
+      (string-to-number (or (getenv "PORT") "8080")))
+
+(lingr-bot-server-start)
 
 (while t
   (accept-process-output nil 1.0))

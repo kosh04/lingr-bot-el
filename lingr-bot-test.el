@@ -32,6 +32,6 @@
                    "(1 . 2)"))
   ;; XXX: shoud allow newline?
   (should (string= (lingr-bot--dispatch-message "!emacs (cons 1 \n 2)")
-                   "nil")))
+                   "End of file during parsing")))
 
 ;; (ert t)

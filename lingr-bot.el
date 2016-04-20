@@ -1,7 +1,7 @@
 ;;; lingr-bot.el --- Chatbot on lingr  -*- lexical-binding: t -*-
 
 ;; Author: KOBAYASHI Shigeru (kosh) <shigeru.kb@gmamil.com> 
-;; Version: 20151101.0
+;; Version: 20160420.0
 ;; Created: 12 Oct 2015
 ;; License: MIT
 
@@ -19,123 +19,88 @@
 (require 'dash)
 (require 's)
 (require 'let-alist)
-(require 'names)
 (require 'time)
 
-(define-namespace lingr-bot-
+(defvar lingr-bot-server-port 8080)
+(defvar lingr-bot-server-host "0.0.0.0")
 
-(defvar server-port 8080)
-(defvar server-host "0.0.0.0")
+(defvar lingr-bot-default-page-url "http://lingr.com/bot/emacs24")
 
-(defun -log (fmt &rest args)
+(defun lingr-bot--log (fmt &rest args)
   "Write simple log message."
   (message "[lingr-bot] %s" (apply #'format fmt args)))
 
-(defun sandbox-eval (form)
-  (-log "eval: %S" form)
-  (let (;;(default-directory nil)
-        (process-environment nil)
-        (initial-environment nil)
-        (exec-path nil)
-        (shell-file-name "true")        ; command "do nothing"
-        (load-path nil))
-    (with-timeout (5 "Timeout.")
-      (with-temp-buffer
-        (condition-case e
-            (eval form)
-          (error (error-message-string e)))))))
+(defvar lingr-bot-commands nil
+  "Bot Commands. its asssoc list. (regexp . command)")
 
-(defun -dispatch-message (text)
-  (cond
-   ;; show version
-   ((equal text "M-x emacs-version")
-    emacs-version)
+(defun define-lingr-bot-command (regexp function)
+  (add-to-list 'lingr-bot-commands (cons regexp function) t))
 
-   ;; show uptime
-   ((equal text "M-x uptime")
-    (emacs-uptime))
+(defun lingr-bot--dispatch-message (text)
+  (cl-loop for (regexp . command) in lingr-bot-commands
+           if (string-match regexp text)
+           return (funcall command text)))
 
-   ;; !emacs EXPR (should be one-line)
-   ((string-match "^!emacs \\(.+\\)" text)
-    (let ((msg (match-string 1 text)))
-      (condition-case e
-          (prin1-to-string
-           (sandbox-eval (read msg)))
-        (error (error-message-string e)))))
-
-   ;; C-h f FUNCTION
-   ((string-match "^C-h f \\(.+\\)" text)
-    (let ((msg (match-string 1 text)))
-      (when (fboundp (intern msg))
-        (documentation (intern msg)))))
-
-   ;; C-h v VARIABLE
-   ((string-match "^C-h v \\(.+\\)" text)
-    (let ((msg (match-string 1 text)))      
-      (documentation-property (intern msg) 'variable-documentation)))
-
-   (t (ignore))))
-
-(defun -parse-message (data)
+(defun lingr-bot--parse-message (data)
   (let-alist (ignore-errors (json-read-from-string data))
     (when (equal .status "ok")
       (cl-loop for event across .events
                do (let-alist event
                     (when (equal .message.type "user")
-                      (cl-return (-dispatch-message .message.text))))))))
+                      (cl-return (lingr-bot--dispatch-message .message.text))))))))
 
-(defun -pretty-format (text)
+(defun lingr-bot--pretty-format (text)
   "Pretty format TEXT for lingr message output."
   (--> (or text "")
        (s-replace "\s" "\u00a0" it)
        (s-truncate (- 1000 3) it)))
 
-(defun root-handler (httpcon)
+(defun lingr-bot-root-handler (httpcon)
   (elnode-http-start httpcon 200 `("Server" . ,(format "GNU Emacs %s" emacs-version)))
   (elnode-http-return httpcon "It works!"))
 
-(defun bot-handler (httpcon)
+(defun lingr-bot-bot-handler (httpcon)
   (elnode-method httpcon
     (POST
      ;; TODO: IP whitelist
      (let* ((http-body-raw (elnode-raw-http-body httpcon))
             (http-body (decode-coding-string http-body-raw 'utf-8))
             (text (condition-case e
-                      (-parse-message http-body)
+                      (lingr-bot--parse-message http-body)
                     (error
-                     (-log "parse-message fail: %S" e)
+                     (lingr-bot--log "Fail parse-message: %S" e)
                      nil))))
        (elnode-http-start httpcon 200 '("Content-Type" . "text/plain; charset=utf-8"))
        (when text
-         (elnode-http-send-string httpcon (-pretty-format text)))
+         (elnode-http-send-string httpcon (lingr-bot--pretty-format text)))
        (elnode-http-return httpcon)))
     (t
-     (elnode-send-redirect httpcon "http://lingr.com/bot/emacs24"))))
+     (elnode-send-redirect httpcon lingr-bot-default-page-url))))
 
-(defun httpd-dispatcher (httpcon)
-  (elnode-dispatcher httpcon
-                     `(("/lingr/" . ,#'bot-handler)
-                       ("/" . ,#'root-handler))))
+(defvar lingr-bot-mapping
+  `(("/lingr/" . ,#'lingr-bot-bot-handler)
+    ("/" . ,#'lingr-bot-root-handler)))
 
-:autoload
-(defun server-start (&optional port host)
+(defun lingr-bot-httpd-dispatcher (httpcon)
+  (elnode-dispatcher httpcon lingr-bot-mapping))
+
+;;;###autoload
+(defun lingr-bot-server-start (&optional port host)
   (interactive)
-  (elnode-start #'httpd-dispatcher
-                :port (or port server-port)
-                :host (or host server-host)))
+  (elnode-start #'lingr-bot-httpd-dispatcher
+                :port (or port lingr-bot-server-port)
+                :host (or host lingr-bot-server-host)))
 
-:autoload
-(defun server-stop (&optional port)
+;;;###autoload
+(defun lingr-bot-server-stop (&optional port)
   (interactive)
-  (elnode-stop (or port server-port)))
+  (elnode-stop (or port lingr-bot-server-port)))
 
-:autoload
-(defun server-restart ()
+;;;###autoload
+(defun lingr-bot-server-restart ()
   (interactive)
-  (server-stop)
-  (server-start))
-
-) ;; end namespace
+  (lingr-bot-server-stop)
+  (lingr-bot-server-start))
 
 (provide 'lingr-bot)
 
