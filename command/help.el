@@ -10,11 +10,14 @@
 (require 'let-alist)
 
 (cl-defun lingr-bot-command/describe-function (text &optional (symbol (intern (match-string 1 text))))
-  (when (fboundp symbol)
-    (documentation symbol)))
+  (if (fboundp symbol)
+      (documentation symbol)
+    (format "Unknown function: %s" symbol)))
 
 (cl-defun lingr-bot-command/describe-variable (text &optional (symbol (intern (match-string 1 text))))
-  (documentation-property symbol 'variable-documentation))
+  (if (boundp symbol)
+      (documentation-property symbol 'variable-documentation)
+    (format "Unknown variable: %s" symbol)))
 
 (defvar lingr-bot-command/-package-archive
   (json-read-from-string
@@ -32,7 +35,9 @@
   ;;   (error (format "Unknown package: %s" feature)))
   (or (--when-let (assoc feature lingr-bot-command/-package-archive)
         (let-alist it
-          (format "%s: %s\n%s" feature .desc .props.url)))
+          (if .props.url
+              (format "%s: %s\n%s" feature .desc .props.url)
+              (format "%s: %s"     feature .desc))))
       (format "Unknown package: %s" feature))
   )
 

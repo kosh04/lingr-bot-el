@@ -16,6 +16,7 @@ Heroku で動作させることを想定していますが、サーバ自体は�
 - `M-x uptime` : 稼働時間を表示します
 - `C-h f FUNCTION` : 関数 FUNCTION のドキュメントを表示します
 - `C-h v VARIABLE` : 変数 VARIABLE のドキュメントを表示します
+- `C-h P PACKAGE`  : パッケージ PACKAGE の概要を表示します
 - `!emacs EXPR` : EXPR を評価します
 
 
