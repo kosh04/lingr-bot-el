@@ -35,9 +35,9 @@
   ;;   (error (format "Unknown package: %s" feature)))
   (or (--when-let (assoc feature lingr-bot-command/-package-archive)
         (let-alist it
-          (if .props.url
-              (format "%s: %s\n%s" feature .desc .props.url)
-              (format "%s: %s"     feature .desc))))
+          (format "%s: %s\n%s"
+                  feature .desc
+                  (or .props.url (format "https://melpa.org/#/%s" feature)))))
       (format "Unknown package: %s" feature))
   )
 
